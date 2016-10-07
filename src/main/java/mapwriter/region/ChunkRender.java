@@ -229,7 +229,81 @@ public class ChunkRender
 		{
 			for (int x = 0; x < MwChunk.SIZE; x++)
 			{
+				
+				int color = 0;
+				int red = 0;
+				int blue = 0;
+				int green = 0;
+				int bcolor = 0;
+				double voidbelow = 0;
+				double voidabove = 0;
+				int lvalue = 0;
+				double alpha = 0;
+//				int opaquetally = 0;
+				int dist = 0;
+				for (int y = startY - 15; y <= startY; y++)
+				{
+					if (y >=0) 
+					{
 
+
+	                                        IBlockState blockState = chunk.getBlockState(x, y, z);
+	                                        bcolor = bc.getColour(blockState);
+                        			alpha = (256-((bcolor >> 24) & 0xff)) / 256;
+                        			if (bcolor == -8650628)
+                        			{
+                        				alpha = 1.0;
+                        			}
+                        			
+						if (chunk.getLightValue(x, y, z) > 0)
+						{
+							voidbelow=voidbelow+(dist*alpha);
+						}
+					}
+					dist++;
+				}
+
+				dist = 16;
+				for (int y = startY + 1; y <= startY+16; y++)
+				{
+					if (y <= 255)
+					{
+	                                        IBlockState blockState = chunk.getBlockState(x, y, z);
+	                                        bcolor = bc.getColour(blockState);
+                        			alpha = (256-((bcolor >> 24) & 0xff)) / 256;
+                        			if (bcolor == -8650628)
+                        			{
+                        				alpha = 1.0;
+                        			}
+						if (chunk.getLightValue(x, y, z) > 0)
+						{
+							voidabove=voidabove+(dist*alpha);
+						}
+					
+					}
+					else
+					{
+					voidabove=voidabove+dist;
+					}
+					dist--;
+				}
+
+//				color = 0x00FF00 - opaquetally * 4096;
+//				color = chunk.getLightValue(x, startY, z) * 16;
+
+				red = (int) voidbelow; // * 6;
+				green = 255 - (int) (voidbelow + voidabove); // * 8);
+				blue = (int) voidabove; // * 6;
+				if (green < 0)
+				{
+					green = 0;
+				}
+				color = red << 16 | green << 8 | blue;
+				int pixelOffset = offset + (z * scanSize) + x;
+				pixels[pixelOffset] = color;
+				
+				
+/*
 				// only process columns where the mask bit is set.
 				// process all columns if mask is null.
 				if ((mask != null) && ((mask[(z * 16) + x]) != FLAG_NON_OPAQUE))
@@ -268,9 +342,12 @@ public class ChunkRender
 						chunk,
 						x,
 						lastNonTransparentY,
+
 						z,
 						getPixelHeightW(pixels, pixelOffset, scanSize),
 						getPixelHeightN(pixels, pixelOffset, scanSize));
+						
+*/
 			}
 		}
 	}
