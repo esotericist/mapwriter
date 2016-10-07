@@ -28,7 +28,7 @@ public class UndergroundTexture extends Texture
 	private int dimension = 0;
 	private int updateX;
 	private int updateZ;
-	private byte[][] updateFlags = new byte[9][256];
+	private byte[][] updateFlags = new byte[25][256];
 	private Point[] loadedChunkArray;
 	private int textureSize;
 	private int textureChunks;
@@ -117,12 +117,14 @@ public class UndergroundTexture extends Texture
 		for (int i = 0; i < this.pixels.length; i++)
 		{
 			int colour = this.pixels[i];
-			int height = (colour >> 24) & 0xff;
+/*			int height = (colour >> 24) & 0xff;
 			int alpha = (y >= height) ? 255 - ((y - height) * 8) : 0;
 			if (alpha < 0)
 			{
 				alpha = 0;
 			}
+*/
+ 			int alpha = 255;
 			this.pixelBufPut(((alpha << 24) & 0xff000000) | (colour & 0xffffff));
 		}
 		this.updateTexture();
@@ -178,14 +180,14 @@ public class UndergroundTexture extends Texture
 		this.py = this.mw.playerYInt;
 		this.pz = this.mw.playerZInt;
 
-		this.updateX = (this.px >> 4) - 1;
-		this.updateZ = (this.pz >> 4) - 1;
+		this.updateX = (this.px >> 4) - 2;
+		this.updateZ = (this.pz >> 4) - 2;
 
 		this.processBlock(this.px - (this.updateX << 4), this.py, this.pz - (this.updateZ << 4));
 
-		int cxMax = this.updateX + 2;
-		int czMax = this.updateZ + 2;
-		WorldClient world = this.mw.mc.world;
+		int cxMax = this.updateX + 4;
+		int czMax = this.updateZ + 4;
+		WorldClient world = this.mw.mc.theWorld;
 		int flagOffset = 0;
 		for (int cz = this.updateZ; cz <= czMax; cz++)
 		{
@@ -230,11 +232,11 @@ public class UndergroundTexture extends Texture
 		int xDist = this.px - x;
 		int zDist = this.pz - z;
 
-		if (((xDist * xDist) + (zDist * zDist)) <= 256)
+		if (((xDist * xDist) + (zDist * zDist)) <= 512)
 		{
 			if (this.isChunkInTexture(x >> 4, z >> 4))
 			{
-				int chunkOffset = ((zi >> 4) * 3) + (xi >> 4);
+				int chunkOffset = ((zi >> 4) * 5) + (xi >> 4);
 				int columnXi = xi & 0xf;
 				int columnZi = zi & 0xf;
 				int columnOffset = (columnZi << 4) + columnXi;
