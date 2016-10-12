@@ -28,7 +28,6 @@ public class UndergroundTexture extends Texture
 	private int dimension = 0;
 	private int updateX;
 	private int updateZ;
-	private byte[][] updateFlags = new byte[25][256];
 	private Point[] loadedChunkArray;
 	private int textureSize;
 	private int textureChunks;
@@ -117,13 +116,6 @@ public class UndergroundTexture extends Texture
 		for (int i = 0; i < this.pixels.length; i++)
 		{
 			int colour = this.pixels[i];
-/*			int height = (colour >> 24) & 0xff;
-			int alpha = (y >= height) ? 255 - ((y - height) * 8) : 0;
-			if (alpha < 0)
-			{
-				alpha = 0;
-			}
-*/
  			int alpha = 255;
 			this.pixelBufPut(((alpha << 24) & 0xff000000) | (colour & 0xffffff));
 		}
@@ -169,8 +161,6 @@ public class UndergroundTexture extends Texture
 
 	public void update()
 	{
-		this.clearFlags();
-
 		if (this.dimension != this.mw.playerDimension)
 		{
 			this.clear();
@@ -180,13 +170,11 @@ public class UndergroundTexture extends Texture
 		this.py = this.mw.playerYInt;
 		this.pz = this.mw.playerZInt;
 
-		this.updateX = (this.px >> 4) - 2;
-		this.updateZ = (this.pz >> 4) - 2;
+		this.updateX = (this.px >> 4) - 3;
+		this.updateZ = (this.pz >> 4) - 3;
 
-		this.processBlock(this.px - (this.updateX << 4), this.py, this.pz - (this.updateZ << 4));
-
-		int cxMax = this.updateX + 4;
-		int czMax = this.updateZ + 4;
+		int cxMax = this.updateX + 6;
+		int czMax = this.updateZ + 6;
 		WorldClient world = this.mw.mc.theWorld;
 		int flagOffset = 0;
 		for (int cz = this.updateZ; cz <= czMax; cz++)
@@ -199,15 +187,13 @@ public class UndergroundTexture extends Texture
 					int tx = (cx << 4) & (this.textureSize - 1);
 					int tz = (cz << 4) & (this.textureSize - 1);
 					int pixelOffset = (tz * this.textureSize) + tx;
-					byte[] mask = this.updateFlags[flagOffset];
 					ChunkRender.renderUnderground(
 							this.mw.blockColours,
 							new RenderChunk(chunk),
 							this.pixels,
 							pixelOffset,
 							this.textureSize,
-							this.py,
-							mask);
+							this.py);
 				}
 				flagOffset += 1;
 			}
