@@ -16,6 +16,8 @@ public class Config
 	public static boolean linearTextureScaling = linearTextureScalingDef;
 	public static boolean undergroundModeDef = false;
 	public static boolean undergroundMode = undergroundModeDef;
+	public static int undergroundRangeDef = 7;
+	public static int undergroundRange = undergroundRangeDef;
 	public static boolean teleportEnabledDef = true;
 	public static boolean teleportEnabled = teleportEnabledDef;
 	public static String teleportCommandDef = "tp";
