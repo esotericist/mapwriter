@@ -221,6 +221,42 @@ public class ChunkRender
 		}
 	}
 
+
+	private static double checkBlockOpenAndVisible(BlockColours bc, IChunk chunk, int x, int y, int z)
+	{
+		int bcolor = 0;
+		int lvalue = 0;
+		double alpha = 0;
+		// todo: This doesn't work as intended.
+		// investigate why, address.
+                IBlockState blockState = chunk.getBlockState(x, y, z);
+		bcolor = bc.getColour(blockState);
+		alpha = (256-((bcolor >> 24) & 0xff)) / 256;
+		
+//		if (alpha > 0.8)
+//		{
+//			alpha = 0.8;		
+//		}
+		if (bcolor == -8650628)
+		{
+			alpha = 1.0;
+		}
+
+		if (alpha < 0.1)
+		{
+			alpha = 0.1;
+		}
+                        			
+		if (chunk.getLightValue(x, y, z) > 0)
+		{
+			return alpha;
+		} else
+		{
+			return 0.0;
+		}
+	
+	}
+
 	public static void renderUnderground(BlockColours bc, IChunk chunk, int[] pixels, int offset,
 			int scanSize, int startY, byte[] mask)
 	{
@@ -233,76 +269,90 @@ public class ChunkRender
 				int color = 0;
 				int red = 0;
 				int blue = 0;
-				int green = 0;
-				int bcolor = 0;
+				int green = 180;
 				double voidbelow = 0;
-				double voidabove = 0;
+				double voidabove = 0;			
 				int lvalue = 0;
 				double alpha = 0;
-//				int opaquetally = 0;
+
 				int dist = 0;
-				for (int y = startY - 15; y <= startY; y++)
+				for (int y = startY-1; y >= startY-15;y--)
 				{
 					if (y >=0) 
 					{
-
-
-	                                        IBlockState blockState = chunk.getBlockState(x, y, z);
-	                                        bcolor = bc.getColour(blockState);
-                        			alpha = (256-((bcolor >> 24) & 0xff)) / 256;
-                        			if (bcolor == -8650628)
-                        			{
-                        				alpha = 1.0;
-                        			}
-                        			
-						if (chunk.getLightValue(x, y, z) > 0)
+						alpha = checkBlockOpenAndVisible(bc, chunk, x, y, z);
+						if (alpha > 0)
 						{
-							voidbelow=voidbelow+(dist*alpha);
+							//voidbelow=voidbelow+(dist*alpha);
+							green = green - (int) (11-dist);
+							red = red + (int) ((15-dist)*alpha);
 						}
 					}
-					dist++;
+					if (dist < 10)
+					{
+						dist++;
+					}
 				}
 
-				dist = 16;
-				for (int y = startY + 1; y <= startY+16; y++)
+				dist = 0;
+				for (int y = startY + 2; y <= startY+16; y++)
 				{
 					if (y <= 255)
 					{
-	                                        IBlockState blockState = chunk.getBlockState(x, y, z);
-	                                        bcolor = bc.getColour(blockState);
-                        			alpha = (256-((bcolor >> 24) & 0xff)) / 256;
-                        			if (bcolor == -8650628)
-                        			{
-                        				alpha = 1.0;
-                        			}
-						if (chunk.getLightValue(x, y, z) > 0)
+						alpha = checkBlockOpenAndVisible(bc, chunk, x, y, z);
+						if (alpha > 0)
 						{
-							voidabove=voidabove+(dist*alpha);
+							//voidabove=voidabove+(dist*alpha);
+							green = green - (int) (11-(dist));
+							blue = blue + (int) ((16-dist)*alpha);
 						}
 					
 					}
 					else
 					{
-					voidabove=voidabove+dist;
+					//voidabove=voidabove+dist;
+					green = green - (int) (14-dist);
+					blue = blue + (int) (17-dist);
 					}
-					dist--;
+					if (dist < 10)
+					{
+						dist++;
+					}
+				}
+				
+				if (checkBlockOpenAndVisible(bc, chunk, x, startY, z)>0)
+				{
+					green = green - 17;
 				}
 
-//				color = 0x00FF00 - opaquetally * 4096;
-//				color = chunk.getLightValue(x, startY, z) * 16;
+				if (checkBlockOpenAndVisible(bc, chunk, x, startY+1, z)>0)
+				{
+					green = green - 17;
+				}
 
-				red = (int) voidbelow; // * 6;
-				green = 255 - (int) (voidbelow + voidabove); // * 8);
-				blue = (int) voidabove; // * 6;
+//				red = (int) voidbelow;
+				if (red > 200)
+				{
+					red = 170;
+				}
+
+//				green = 200 - (int) (voidbelow + voidabove);
 				if (green < 0)
 				{
 					green = 0;
+				}
+
+//				blue = (int) voidabove;
+				if (blue > 200)
+				{
+					blue = 170;
 				}
 				color = red << 16 | green << 8 | blue;
 				int pixelOffset = offset + (z * scanSize) + x;
 				pixels[pixelOffset] = color;
 				
-				
+
+// Old code below				
 /*
 				// only process columns where the mask bit is set.
 				// process all columns if mask is null.
