@@ -113,6 +113,14 @@ public class ConfigurationHandler
 				Config.undergroundModeDef,
 				"",
 				"mw.config.undergroundMode");
+		Config.undergroundRange = configuration.getInt(
+				"undergroundRange",
+				Reference.catOptions,
+				Config.undergroundRangeDef,
+				3,
+				15,
+				"",
+				"mw.config.undergroundRange");
 		Config.regionFileOutputEnabledSP = configuration.getBoolean(
 				"regionFileOutputEnabledSP",
 				Reference.catOptions,

@@ -13,6 +13,7 @@ import mapwriter.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -21,6 +22,9 @@ public class ChunkManager
 	public Mw mw;
 	private boolean closed = false;
 	private CircularHashMap<Chunk, Integer> chunkMap = new CircularHashMap<Chunk, Integer>();
+	
+	private int ugpatch = 0;
+	private long renderTick = 0;
 
 	private static final int VISIBLE_FLAG = 0x01;
 	private static final int VIEWED_FLAG = 0x02;
@@ -97,17 +101,70 @@ public class ChunkManager
 
 	public void updateUndergroundChunks()
 	{
-		int chunkArrayX = (this.mw.playerXInt >> 4) - 4;
-		int chunkArrayZ = (this.mw.playerZInt >> 4) - 4;
-		MwChunk[] chunkArray = new MwChunk[49];
-		for (int z = 0; z < 7; z++)
+		World world = Minecraft.getMinecraft().theWorld;
+		long thisTick = world.getTotalWorldTime();
+		if (thisTick == renderTick)
 		{
-			for (int x = 0; x < 7; x++)
+			return;
+		}
+		ugpatch = (int) thisTick % 5;
+		renderTick = thisTick;
+		int diameter = Config.undergroundRange;
+		int radius = (diameter - 1) / 2;
+		int center = ((diameter-1) / 2);
+		if (center % 2 == 0)
+		{
+			center++;
+		}
+		int band = ((diameter-center)/2);
+		int minX = 0;
+		int maxX = diameter;
+		int minZ = 0;
+		int maxZ = diameter;
+		int chunkArrayX = (this.mw.playerXInt >> 4) - radius;
+		int chunkArrayZ = (this.mw.playerZInt >> 4) - radius;
+		MwChunk[] chunkArray = new MwChunk[diameter*diameter];
+		
+		ugpatch++;
+		if (diameter > 3)
+		{
+			switch (this.ugpatch)
+			{
+				case 0:
+					maxX = band;
+					maxZ = diameter-band;
+					break;
+				case 1:
+					minX = band+1;
+					maxZ = band;
+					break;
+				case 2:
+					minX = (diameter-band)+1;
+					minZ = band+1;
+					break;
+				case 3:
+					maxX = diameter-band;
+					minZ = (diameter-band)+1;
+					maxZ = diameter-band;
+					break;
+				default:
+					minX = band+1;
+					maxX = diameter-band;
+					minZ = band+1;
+					maxZ = diameter-band;
+					ugpatch = 0;
+					break;
+			}
+		}
+		
+		for (int z = minZ; z < maxZ; z++)
+		{
+			for (int x = minX; x < maxX; x++)
 			{
 				Chunk chunk = this.mw.mc.world.getChunkFromChunkCoords(chunkArrayX + x, chunkArrayZ + z);
 				if (!chunk.isEmpty())
 				{
-					chunkArray[(z * 7) + x] = copyToMwChunk(chunk);
+					chunkArray[(z * diameter) + x] = copyToMwChunk(chunk);
 				}
 			}
 		}

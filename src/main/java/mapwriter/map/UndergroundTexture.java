@@ -5,10 +5,13 @@ import java.util.Arrays;
 
 import org.lwjgl.opengl.GL11;
 
+
 import mapwriter.Mw;
 import mapwriter.region.ChunkRender;
 import mapwriter.region.IChunk;
 import mapwriter.util.Texture;
+import mapwriter.config.Config;
+import mapwriter.util.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -169,17 +172,74 @@ public class UndergroundTexture extends Texture
 		this.px = this.mw.playerXInt;
 		this.py = this.mw.playerYInt;
 		this.pz = this.mw.playerZInt;
-
-		this.updateX = (this.px >> 4) - 3;
-		this.updateZ = (this.pz >> 4) - 3;
-
-		int cxMax = this.updateX + 6;
-		int czMax = this.updateZ + 6;
 		WorldClient world = this.mw.mc.theWorld;
-		int flagOffset = 0;
-		for (int cz = this.updateZ; cz <= czMax; cz++)
+
+		
+		
+		int diameter = Config.undergroundRange;
+		int radius = (diameter - 1) / 2;
+
+		                                
+		this.updateX = (this.px >> 4) - radius;
+		this.updateZ = (this.pz >> 4) - radius;
+
+		int cxMax = this.updateX + diameter-1;
+		int czMax = this.updateZ + diameter-1;
+				
+		
+                int center = ((diameter-1) / 2);
+
+		if (center % 2 == 0)
+
 		{
-			for (int cx = this.updateX; cx <= cxMax; cx++)
+			center++;
+		}
+		int band = ((diameter-center)/2); 
+
+		int minX = this.updateX;
+		int maxX = cxMax;
+		int minZ = this.updateZ;
+		int maxZ = czMax;
+
+                if (diameter > 3)
+                {
+                        switch ((int) mw.tickCounter % 10)
+                        {
+			case 0:
+                        	maxX = minX + band - 1;
+				maxZ = minZ + diameter - band - 1;
+				break;
+			case 1:
+				minX = minX + band;
+				maxZ = minZ + band - 1;
+				break;
+			case 2:
+				minX = minX + diameter-band;
+				minZ = minZ + band;
+				break;
+			case 3:
+				maxX = minX + diameter-band-1;
+				maxZ = minZ + diameter-1;
+				minZ = minZ + diameter-band;
+				break;
+			case 4:
+				maxX = minX + diameter-band-1;
+				minX = minX + band;
+				maxZ = minZ + diameter-band-1;
+				minZ = minZ + band;
+				break;
+			default:
+				return;
+                        }
+                }
+		
+		
+//		Logging.logInfo("tick: %d, minX: %d, maxX: %d, minZ: %d, maxZ: %d, band: %d, center: %d, diameter: %d.",mw.tickCounter, minX, maxX, minZ, maxZ, band, center, diameter);
+		
+//		int flagOffset = 0;
+		for (int cz = minZ; cz <= maxZ; cz++)
+		{
+			for (int cx = minX; cx <= maxX; cx++)
 			{
 				if (this.isChunkInTexture(cx, cz))
 				{
@@ -195,7 +255,7 @@ public class UndergroundTexture extends Texture
 							this.textureSize,
 							this.py);
 				}
-				flagOffset += 1;
+//				flagOffset += 1;
 			}
 		}
 

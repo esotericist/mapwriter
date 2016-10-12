@@ -484,8 +484,16 @@ public class Mw
 			// this makes it posible to change to underground mode in the config
 			// screen.
 			this.miniMap.view.setUndergroundMode(Config.undergroundMode);
+			if ((Config.undergroundRange % 2) == 0)
+			{
+				Config.undergroundRange--;
+			}
+			if (Config.undergroundRange < 3)
+			{
+				Config.undergroundRange = 3;
+			}
 
-			if (Config.undergroundMode && ((this.tickCounter % 30) == 0))
+			if (Config.undergroundMode)
 			{
 				this.undergroundMapTexture.update();
 			}
