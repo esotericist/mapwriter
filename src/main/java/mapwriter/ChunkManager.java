@@ -90,17 +90,17 @@ public class ChunkManager
 
 	public void updateUndergroundChunks()
 	{
-		int chunkArrayX = (this.mw.playerXInt >> 4) - 3;
-		int chunkArrayZ = (this.mw.playerZInt >> 4) - 3;
-		MwChunk[] chunkArray = new MwChunk[25];
-		for (int z = 0; z < 5; z++)
+		int chunkArrayX = (this.mw.playerXInt >> 4) - 4;
+		int chunkArrayZ = (this.mw.playerZInt >> 4) - 4;
+		MwChunk[] chunkArray = new MwChunk[49];
+		for (int z = 0; z < 7; z++)
 		{
-			for (int x = 0; x < 5; x++)
+			for (int x = 0; x < 7; x++)
 			{
 				Chunk chunk = this.mw.mc.theWorld.getChunkFromChunkCoords(chunkArrayX + x, chunkArrayZ + z);
 				if (!chunk.isEmpty())
 				{
-					chunkArray[(z * 5) + x] = copyToMwChunk(chunk);
+					chunkArray[(z * 7) + x] = copyToMwChunk(chunk);
 				}
 			}
 		}

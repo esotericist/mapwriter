@@ -233,10 +233,6 @@ public class ChunkRender
 		bcolor = bc.getColour(blockState);
 		alpha = (256-((bcolor >> 24) & 0xff)) / 256;
 		
-//		if (alpha > 0.8)
-//		{
-//			alpha = 0.8;		
-//		}
 		if (bcolor == -8650628)
 		{
 			alpha = 1.0;
@@ -258,7 +254,7 @@ public class ChunkRender
 	}
 
 	public static void renderUnderground(BlockColours bc, IChunk chunk, int[] pixels, int offset,
-			int scanSize, int startY, byte[] mask)
+			int scanSize, int startY)
 	{
 		startY = Math.min(Math.max(0, startY), 255);
 		for (int z = 0; z < MwChunk.SIZE; z++)
@@ -283,7 +279,6 @@ public class ChunkRender
 						alpha = checkBlockOpenAndVisible(bc, chunk, x, y, z);
 						if (alpha > 0)
 						{
-							//voidbelow=voidbelow+(dist*alpha);
 							green = green - (int) (11-dist);
 							red = red + (int) ((15-dist)*alpha);
 						}
@@ -302,7 +297,6 @@ public class ChunkRender
 						alpha = checkBlockOpenAndVisible(bc, chunk, x, y, z);
 						if (alpha > 0)
 						{
-							//voidabove=voidabove+(dist*alpha);
 							green = green - (int) (11-(dist));
 							blue = blue + (int) ((16-dist)*alpha);
 						}
@@ -310,7 +304,6 @@ public class ChunkRender
 					}
 					else
 					{
-					//voidabove=voidabove+dist;
 					green = green - (int) (14-dist);
 					blue = blue + (int) (17-dist);
 					}
@@ -330,19 +323,16 @@ public class ChunkRender
 					green = green - 17;
 				}
 
-//				red = (int) voidbelow;
 				if (red > 200)
 				{
 					red = 170;
 				}
 
-//				green = 200 - (int) (voidbelow + voidabove);
 				if (green < 0)
 				{
 					green = 0;
 				}
 
-//				blue = (int) voidabove;
 				if (blue > 200)
 				{
 					blue = 170;
@@ -350,54 +340,6 @@ public class ChunkRender
 				color = red << 16 | green << 8 | blue;
 				int pixelOffset = offset + (z * scanSize) + x;
 				pixels[pixelOffset] = color;
-				
-
-// Old code below				
-/*
-				// only process columns where the mask bit is set.
-				// process all columns if mask is null.
-				if ((mask != null) && ((mask[(z * 16) + x]) != FLAG_NON_OPAQUE))
-				{
-					continue;
-				}
-
-				// get the last non transparent block before the first opaque
-				// block searching
-				// towards the sky from startY
-				int lastNonTransparentY = startY;
-				for (int y = startY; y < chunk.getMaxY(); y++)
-				{
-					IBlockState blockState = chunk.getBlockState(x, y, z);
-					int color = bc.getColour(blockState);
-					int alpha = (color >> 24) & 0xff;
-
-					if (color == -8650628)
-					{
-						alpha = 0;
-					}
-
-					if (alpha == 0xff)
-					{
-						break;
-					}
-					if (alpha > 0)
-					{
-						lastNonTransparentY = y;
-					}
-				}
-
-				int pixelOffset = offset + (z * scanSize) + x;
-				pixels[pixelOffset] = getColumnColour(
-						bc,
-						chunk,
-						x,
-						lastNonTransparentY,
-
-						z,
-						getPixelHeightW(pixels, pixelOffset, scanSize),
-						getPixelHeightN(pixels, pixelOffset, scanSize));
-						
-*/
 			}
 		}
 	}
