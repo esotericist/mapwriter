@@ -31,6 +31,7 @@ public class UndergroundTexture extends Texture
 	private int dimension = 0;
 	private int updateX;
 	private int updateZ;
+	private byte[][] updateFlags = new byte[9][256];
 	private Point[] loadedChunkArray;
 	private int textureSize;
 	private int textureChunks;
@@ -172,7 +173,7 @@ public class UndergroundTexture extends Texture
 		this.px = this.mw.playerXInt;
 		this.py = this.mw.playerYInt;
 		this.pz = this.mw.playerZInt;
-		WorldClient world = this.mw.mc.theWorld;
+		WorldClient world = this.mw.mc.world;
 
 		
 		

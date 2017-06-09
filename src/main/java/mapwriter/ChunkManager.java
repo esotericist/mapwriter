@@ -101,7 +101,7 @@ public class ChunkManager
 
 	public void updateUndergroundChunks()
 	{
-		World world = Minecraft.getMinecraft().theWorld;
+		World world = Minecraft.getMinecraft().world;
 		long thisTick = world.getTotalWorldTime();
 		if (thisTick == renderTick)
 		{
