@@ -83,17 +83,20 @@ public class BlockColours
 
 		if (block.delegate == null)
 		{
-			Logging.logError(
+/*			Logging.logError(
 					"Delegate was Null when getting colour, Block in: %s",
 					block.toString());
+*/
 			return 0;
 		}
 		else if (block.delegate.name() == null)
 		{
+/*
 			Logging.logError(
 					"Block Name was Null when getting colour, Block in: %s, Delegate: %s",
 					block.toString(),
 					block.delegate.toString());
+*/
 			return 0;
 		}
 		return this.getColour(block.delegate.name().toString(), meta);
