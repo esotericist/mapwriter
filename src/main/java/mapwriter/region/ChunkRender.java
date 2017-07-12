@@ -229,6 +229,14 @@ public class ChunkRender
 		double alpha = 0;
 		// todo: This doesn't work as intended.
 		// investigate why, address.
+		if (y>255)
+		{
+			return 1.0;
+		}
+		if (y<0)
+		{
+			return 0.0;
+		}
                 IBlockState blockState = chunk.getBlockState(x, y, z);
 		bcolor = bc.getColour(blockState);
 		alpha = (256-((bcolor >> 24) & 0xff)) / 256;
@@ -274,14 +282,11 @@ public class ChunkRender
 				int dist = 0;
 				for (int y = startY-1; y >= startY-15;y--)
 				{
-					if (y >=0) 
+					alpha = checkBlockOpenAndVisible(bc, chunk, x, y, z);
+					if (alpha > 0)
 					{
-						alpha = checkBlockOpenAndVisible(bc, chunk, x, y, z);
-						if (alpha > 0)
-						{
-							green = green - (int) (11-dist);
-							red = red + (int) ((15-dist)*alpha);
-						}
+						green = green - (int) (11-dist);
+						red = red + (int) ((15-dist)*alpha);
 					}
 					if (dist < 10)
 					{
@@ -304,20 +309,18 @@ public class ChunkRender
 					}
 					else
 					{
-					green = green - (int) (14-dist);
-					blue = blue + (int) (17-dist);
+						green = green - (int) (14-dist);
+						blue = blue + (int) (17-dist);
 					}
 					if (dist < 10)
 					{
 						dist++;
 					}
 				}
-				
 				if (checkBlockOpenAndVisible(bc, chunk, x, startY, z)>0)
 				{
 					green = green - 17;
 				}
-
 				if (checkBlockOpenAndVisible(bc, chunk, x, startY+1, z)>0)
 				{
 					green = green - 17;
